@@ -20,7 +20,7 @@
 Translate ~/Downloads/my-book.epub to Chinese
 ```
 
-That's it. Claude handles extraction, style analysis, parallel translation, and repackaging. The output appears next to the original as `my-book_zh.epub`. **Your original file is never modified.**
+That's it. Claude handles extraction, style analysis, parallel translation, and repackaging. The output lands in `output/my-book_zh.epub`. **Your original file is never modified.**
 
 ## ✨ Features
 
@@ -45,6 +45,7 @@ You can override the auto-detected style with a custom hint: `"formal and academ
 ### All features
 
 - **Parallel 3-agent architecture** — three Claude subagents translate concurrently with size-aware file dispatch, delivering ~3x throughput over sequential tools
+- **Handles unpacked ePub folders** — Apple Books and Calibre often store books as a *directory* named `something.epub`; the skill detects this and repacks before translating
 - **Automatic style matching** — analyzes genre, tone, voice, and vocabulary before translating (see above)
 - **Translation verification & auto-retry** — detects partially translated chapters (untranslated paragraphs, truncated files) and automatically retries them
 - **Context carry-over** — terminology established in early chapters is maintained throughout the book; no more "same word, three translations" across chapters
@@ -175,7 +176,7 @@ Translate my-novel.epub to Spanish with a formal, literary tone
 | Source file | Yes | — | Path to the `.epub` file |
 | Target language | Yes | — | e.g., `Chinese`, `Japanese`, `zh`, `ja` |
 | Output mode | No | `pure` | `pure` (translated only) or `bilingual` (side-by-side) |
-| Output path | No | `<name>_<lang>.epub` | Custom output file path |
+| Output path | No | `output/<name>_<lang>.epub` | Custom output file path |
 | Tone/style | No | auto-detect | Style hint, e.g., `"formal and academic"` |
 | Pause between rounds | No | ask | `yes` to review between rounds, `no` for continuous |
 
@@ -191,7 +192,8 @@ Translate my-book.epub to Chinese in bilingual mode
 
 | Limitation | Workaround |
 |------------|------------|
-| Max ~9 chapters per round (3 agents × 3 files) | Auto-dispatches multiple rounds; checkpoints preserve progress |
+| ~200 KB of source text per agent per round | Auto-dispatches multiple rounds; checkpoints preserve progress |
+| Chapter titles rendered as images stay untranslated | Common in Calibre conversions. No OCR capability — the skill detects this and warns before starting, and still translates the TOC so navigation is in the target language |
 | Text in images/SVG not translated | No OCR capability; re-create images separately if needed |
 | Fixed-layout ePub may reflow poorly | Best for reflowable ePub; the skill warns about fixed-layout |
 | `<ruby>`/`<rt>` annotations preserved as-is | Manual editing needed for CJK reading aids |

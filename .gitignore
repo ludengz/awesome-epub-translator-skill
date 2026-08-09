@@ -1,0 +1,7 @@
+# Source books and translated output — never commit copyrighted material
+books/
+output/
+*_translation_work/
+
+# macOS
+.DS_Store

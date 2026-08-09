@@ -1,5 +1,5 @@
 {
   "name": "awesome-epub-translator",
   "description": "Translate ePub files between languages with high-quality AI translation. Preserves formatting, inline HTML tags, images, and styles. Supports pure translation and bilingual output modes.",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
