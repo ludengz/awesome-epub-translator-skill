@@ -51,7 +51,8 @@ You can override the auto-detected style with a custom hint: `"formal and academ
 - **Context carry-over** — terminology established in early chapters is maintained throughout the book; no more "same word, three translations" across chapters
 - **Structure preservation** — all formatting, inline HTML tags, images, styles, and CSS remain intact
 - **Checkpoint resumability** — translated chapters are saved incrementally; resume across conversation sessions without re-translating
-- **Bilingual mode** — outputs original + translated text side by side in the same ePub with subtle CSS styling — perfect for language learners
+- **Bilingual mode** — outputs original + translated text side by side in the same ePub with subtle CSS styling that follows the reader's light/dark theme — perfect for language learners
+- **Script-aware leading** — when translating into Chinese, Japanese, or Korean, repairs line-height that the source stylesheet set for Latin text. No fonts, ornaments, or restyling beyond that: a translated book should look like the original book
 - **ePub 2 & 3 support** — handles both `toc.ncx` and `toc.xhtml` navigation formats
 - **DRM detection** — detects DRM-encrypted files and stops cleanly (see [Legal & DRM](#legal--drm))
 - **Zero external services** — no API keys, no translation services beyond Claude Code itself

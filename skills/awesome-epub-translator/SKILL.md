@@ -457,19 +457,52 @@ find "$staging_dir" -name "*.py" -o -name "*.txt" -o -name "*.md" -o -name "*.lo
 ```
 If any unexpected files are found, remove them before proceeding.
 
-#### 9.4: Bilingual CSS Injection (bilingual mode only)
-If bilingual mode is active:
+#### 9.4: CSS Injection
+
+Everything here is **appended** to the existing stylesheet. Never edit or delete a publisher rule — see Prohibitions.
+
+##### 9.4a: Bilingual styles (bilingual mode only)
+
 1. Check if a main CSS file exists in the staging directory (found in Step 5)
-2. If yes: append to the end of that CSS file:
+2. If yes, append:
    ```css
 
    /* Bilingual translation styles */
-   .translated { color: #555555; font-size: 0.95em; margin-top: 0.2em; }
+   .translated {
+       font-size: 0.95em;
+       margin-top: 0.15em;
+       padding-left: 0.6em;
+       border-left: 2px solid rgba(128, 128, 128, 0.35);
+       }
    ```
 3. If no CSS file exists:
-   - Create `<content_dir>/Styles/bilingual.css` with the above CSS rule
+   - Create `<content_dir>/Styles/bilingual.css` with the above rule
    - Add to `content.opf` manifest: `<item id="bilingual-css" href="Styles/bilingual.css" media-type="text/css"/>`
-   - Add `<link>` reference in each translated XHTML file's `<head>`
+   - Add a `<link>` reference in each translated XHTML file's `<head>`
+
+**Do not set a hardcoded `color` on `.translated`.** A fixed gray such as `#555555` is legible on white and nearly unreadable in a reader's dark mode, where it becomes dark gray on black. Omitting `color` lets the translated text inherit the reader's theme. The neutral `rgba()` border reads correctly on both light and dark backgrounds and gives the eye a rail for tracking original/translation pairs down a long page.
+
+##### 9.4b: Target-language readability (both modes)
+
+Source stylesheets are written for the source script. A book typeset for English routinely sets no `line-height` at all, or sets ~1.2 — fine for Latin text, cramped to the point of looking broken for CJK, where glyphs are dense and full-height.
+
+If the target language is Chinese, Japanese, or Korean, check the existing CSS for a body-text `line-height`. If none is set, or it is below `1.5`, append a rule scoped to the classes actually used by translated paragraphs:
+
+```css
+
+/* CJK readability for translated text */
+.translated, <comma-separated list of body-paragraph classes> {
+    line-height: 1.75;
+    }
+```
+
+Determine the class list from the translated files rather than guessing — in a Calibre conversion it will be names like `.calibre6`, in another book `.para` or nothing at all (in which case target `p`).
+
+Scope and restraint:
+- This is **repair, not decoration** — it exists because the translation changed the script, not because the publisher's design was wrong.
+- Do NOT add `font-family` (embedding fonts bloats the file and raises licensing questions; readers have good CJK defaults), `text-indent`, drop caps, ornaments, restyled headings, or any other house style. The skill's promise is that the translation looks like the original book.
+- If the source CSS already sets an adequate `line-height`, add nothing.
+- Mention the appended rules in the final report so the user knows what changed, and honor a request to skip them.
 
 #### 9.5: Package as ePub ZIP
 
@@ -593,7 +626,8 @@ rm -rf "<work_dir>"
 Do NOT:
 - Remove or modify images
 - Alter the ePub file/directory structure
-- Modify existing CSS rules (only append bilingual styles if needed)
+- Modify existing CSS rules — only ever append (bilingual styles, and the CJK line-height repair in 9.4b)
+- Restyle the book: no embedded fonts, custom font stacks, drop caps, ornaments, recolored or re-sized headings, replacement covers, or any other house style. A translated book should look like the original book, and every rule you add is a rule that can collide with the publisher's design
 - Translate content inside `<code>` or `<pre>` tags
 - Translate `href`, `src`, `id`, `class`, or other HTML attribute values
 - Translate author names
@@ -614,4 +648,5 @@ Tell the user upfront:
 - Large books may require multiple rounds of subagent dispatch; files with no translatable text are copied through in the main agent and never consume a round
 - Subagent dispatch has overhead; for books with ≤1 remaining chapters, translation is done directly without subagents
 - Resumability checks file existence only; if the source ePub changes between runs, delete `_translated/` to force re-translation
-- Bilingual mode auto-injects minimal CSS (`.translated { color: #555; font-size: 0.95em; }`); users may customize further
+- Bilingual mode appends a minimal `.translated` rule (slightly smaller text, a neutral left rule); it deliberately sets no `color` so the text follows the reader's light/dark theme. Users may customize further
+- For CJK targets the skill may append a `line-height` rule when the source stylesheet has none — repairing leading that was set for Latin text. It makes no other styling changes: no fonts, no ornaments, no restyled headings
